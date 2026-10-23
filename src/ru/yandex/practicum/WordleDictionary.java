@@ -4,7 +4,6 @@ import ru.yandex.practicum.logger.Logger;
 
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /*
 этот класс содержит в себе список слов List<String>
