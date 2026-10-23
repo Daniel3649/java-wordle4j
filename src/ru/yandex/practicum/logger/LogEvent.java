@@ -1,8 +1,5 @@
 package ru.yandex.practicum.logger;
 
-import ru.yandex.practicum.exception.tech.log.IncompleteLogEventException;
-import ru.yandex.practicum.exception.tech.log.LogEventAlreadyLoggedException;
-
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -41,7 +38,7 @@ public final class LogEvent {
     public LogEvent addKeyValue(
             final String key,
             final Object value
-    ) throws LogEventAlreadyLoggedException {
+    ) {
         ensureNotFinalized();
         validateKey(key);
 
@@ -50,7 +47,7 @@ public final class LogEvent {
         return this;
     }
 
-    public void log(final String message) throws LogEventAlreadyLoggedException {
+    public void log(final String message) {
         ensureNotFinalized();
 
         this.message = Objects.requireNonNull(
@@ -85,9 +82,9 @@ public final class LogEvent {
         return level;
     }
 
-    public String getMessage() throws IncompleteLogEventException {
+    public String getMessage() {
         if (!finalized) {
-            throw new IncompleteLogEventException(
+            throw new IllegalStateException(
                     "Log event is not finalized"
             );
         }
@@ -99,9 +96,9 @@ public final class LogEvent {
         return Collections.unmodifiableMap(attributes);
     }
 
-    private void ensureNotFinalized() throws LogEventAlreadyLoggedException {
+    private void ensureNotFinalized() {
         if (finalized) {
-            throw new LogEventAlreadyLoggedException(
+            throw new IllegalStateException(
                     "Log event has already been submitted"
             );
         }

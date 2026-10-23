@@ -1,8 +1,5 @@
 package ru.yandex.practicum.logger;
 
-import ru.yandex.practicum.exception.tech.log.IncompleteLogEventException;
-import ru.yandex.practicum.exception.tech.log.LogEventAlreadyLoggedException;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -51,8 +48,7 @@ public final class Logger implements AutoCloseable {
         return new LogEvent(this, level);
     }
 
-    void write(final LogEvent event)
-            throws IncompleteLogEventException, LogEventAlreadyLoggedException {
+    void write(final LogEvent event) {
         Objects.requireNonNull(event, "Log event must not be null");
         ensureOpen();
 
