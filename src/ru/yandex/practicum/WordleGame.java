@@ -1,5 +1,7 @@
 package ru.yandex.practicum;
 
+import ru.yandex.practicum.game.WordleDictionary;
+
 /*
 в этом классе хранится словарь и состояние игры
     текущий шаг

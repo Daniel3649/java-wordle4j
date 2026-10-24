@@ -1,4 +1,4 @@
-package ru.yandex.practicum;
+package ru.yandex.practicum.game;
 
 import ru.yandex.practicum.logger.Logger;
 
@@ -59,6 +59,10 @@ public final class WordleDictionary {
                 logger.atWarn()
                         .addKeyValue("word_length", word.length())
                         .log("Word list contains a blank word");
+                continue;
+            }
+
+            if (word.length() != GlobalRule.WORD_LENGTH) {
                 continue;
             }
 

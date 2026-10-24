@@ -1,4 +1,4 @@
-package ru.yandex.practicum;
+package ru.yandex.practicum.game;
 
 import ru.yandex.practicum.logger.Logger;
 
