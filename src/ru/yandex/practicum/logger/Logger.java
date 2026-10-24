@@ -17,10 +17,16 @@ public final class Logger implements AutoCloseable {
 
     private final PrintWriter out;
     private boolean closed;
+    private final boolean debugMode;
 
     public Logger(final Path path) throws IOException {
+        this(path, false);
+    }
+
+    public Logger(final Path path, final boolean debugMode) throws IOException {
         Objects.requireNonNull(path, "Log path must not be null");
 
+        this.debugMode = debugMode;
         this.out = new PrintWriter(
                 Files.newBufferedWriter(
                         path,
@@ -43,6 +49,10 @@ public final class Logger implements AutoCloseable {
         return newEvent(LogLevel.ERROR);
     }
 
+    public LogEvent atDebug() {
+        return newEvent(LogLevel.DEBUG);
+    }
+
     private LogEvent newEvent(final LogLevel level) {
         ensureOpen();
         return new LogEvent(this, level);
@@ -51,6 +61,10 @@ public final class Logger implements AutoCloseable {
     void write(final LogEvent event) {
         Objects.requireNonNull(event, "Log event must not be null");
         ensureOpen();
+
+        if (event.getLevel() == LogLevel.DEBUG && !debugMode) {
+            return;
+        }
 
         StringBuilder log = new StringBuilder();
 

@@ -3,9 +3,10 @@ package ru.yandex.practicum.logger;
 public enum LogLevel {
     INFO("INFO"),
     WARN("WARN"),
-    ERROR("ERROR");
+    ERROR("ERROR"),
+    DEBUG("DEBUG");
 
-    private String text;
+    private final String text;
 
     LogLevel(final String text) {
         this.text = text;

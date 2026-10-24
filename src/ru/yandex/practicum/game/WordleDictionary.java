@@ -63,6 +63,13 @@ public final class WordleDictionary {
             }
 
             if (word.length() != GlobalRule.WORD_LENGTH) {
+                logger.atDebug()
+                        .addKeyValue("word_length", word.length())
+                        .addKeyValue("word", word)
+                        .addKeyValue("required_word_length", GlobalRule.WORD_LENGTH)
+                        .log("Word list contains word with unsuitable length. " +
+                                "Word: %s, word length: %d, required word length: %d",
+                                word, word.length(), GlobalRule.WORD_LENGTH);
                 continue;
             }
 
