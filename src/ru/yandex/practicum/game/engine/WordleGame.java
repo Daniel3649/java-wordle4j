@@ -200,4 +200,8 @@ public final class WordleGame {
     public int getRemainingSteps() {
         return remainingSteps;
     }
+
+    public String getSecret() {
+        return secret;
+    }
 }
