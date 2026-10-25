@@ -1,4 +1,4 @@
-package ru.yandex.practicum.game;
+package ru.yandex.practicum.game.dictionary;
 
 import ru.yandex.practicum.logger.Logger;
 
@@ -12,11 +12,13 @@ import java.util.regex.Pattern;
  */
 public final class WordleDictionary {
 
-    private static final Pattern WORD_PATTERN =
+    public static final int WORD_LENGTH = 5;
+
+    public static final Pattern WORD_PATTERN =
             Pattern.compile("[а-я]+");
 
     private final Logger logger;
-    private final List<String> words;
+    private final Set<String> words;
 
     public WordleDictionary(
             final List<String> words,
@@ -32,15 +34,13 @@ public final class WordleDictionary {
                 "Logger must not be null"
         );
 
-
         this.words = prepareWords(words);
     }
 
-    private List<String> prepareWords(final List<String> rawWords) {
-        Set<String> uniqueWords = new LinkedHashSet<>();
+    private Set<String> prepareWords(final List<String> rawWords) {
+        Set<String> preparedWords = new LinkedHashSet<>();
 
         for (String rawWord : rawWords) {
-
             if (rawWord == null) {
                 logger.atWarn()
                         .log("Word list contains a null word");
@@ -51,25 +51,18 @@ public final class WordleDictionary {
 
             if (word.isEmpty()) {
                 logger.atWarn()
-                        .log("Word list contains an empty word");
+                        .log("Word list contains an empty or blank word");
                 continue;
             }
 
-            if (word.isBlank()) {
-                logger.atWarn()
-                        .addKeyValue("word_length", word.length())
-                        .log("Word list contains a blank word");
-                continue;
-            }
-
-            if (word.length() != GlobalRule.WORD_LENGTH) {
+            if (!hasValidLength(word)) {
                 logger.atDebug()
-                        .addKeyValue("word_length", word.length())
                         .addKeyValue("word", word)
-                        .addKeyValue("required_word_length", GlobalRule.WORD_LENGTH)
-                        .log("Word list contains word with unsuitable length. " +
-                                "Word: %s, word length: %d, required word length: %d",
-                                word, word.length(), GlobalRule.WORD_LENGTH);
+                        .addKeyValue("word_length", word.length())
+                        .addKeyValue("required_word_length", WORD_LENGTH)
+                        .log(
+                                "Word list contains a word with unsuitable length"
+                        );
                 continue;
             }
 
@@ -81,27 +74,25 @@ public final class WordleDictionary {
                                 WORD_PATTERN.pattern()
                         )
                         .log(
-                                "Word list contains an invalid word: %s. Valid pattern: %s",
-                                word,
-                                WORD_PATTERN.pattern()
+                                "Word list contains a word with invalid characters"
                         );
                 continue;
             }
 
-            if (!uniqueWords.add(word)) {
+            if (!preparedWords.add(word)) {
                 logger.atWarn()
                         .addKeyValue("repeated_word", word)
-                        .log("Word list contains a duplicate word: %s", word);
+                        .log("Word list contains a duplicate word");
             }
         }
 
-        if (uniqueWords.isEmpty()) {
+        if (preparedWords.isEmpty()) {
             throw new IllegalArgumentException(
                     "Word list must contain at least one valid word"
             );
         }
 
-        return List.copyOf(uniqueWords);
+        return Collections.unmodifiableSet(preparedWords);
     }
 
     public String normalizeWord(final String word) {
@@ -110,7 +101,8 @@ public final class WordleDictionary {
                 "Word must not be null"
         );
 
-        return word.toLowerCase(Locale.ROOT)
+        return word.strip()
+                .toLowerCase(Locale.ROOT)
                 .replace('ё', 'е');
     }
 
@@ -125,7 +117,20 @@ public final class WordleDictionary {
         ).matches();
     }
 
-    public List<String> getWords() {
-        return words;
+    public boolean hasValidLength(final String word) {
+        Objects.requireNonNull(
+                word,
+                "Word must not be null"
+        );
+
+        return word.length() == WORD_LENGTH;
+    }
+
+    public List<String> getWordList() {
+        return List.copyOf(words);
+    }
+
+    public boolean contains(final String word) {
+        return words.contains(word);
     }
 }
