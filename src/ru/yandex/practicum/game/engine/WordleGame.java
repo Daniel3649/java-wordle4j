@@ -26,11 +26,12 @@ public final class WordleGame {
     private int remainingSteps;
     private final List<String> wordCandidates;
     private final Logger logger;
+    private final WordleDictionary dictionary;
 
     private boolean won;
 
     public WordleGame(final WordleDictionary dictionary, final Logger logger) {
-        Objects.requireNonNull(
+        this.dictionary = Objects.requireNonNull(
                 dictionary, "Dictionary can't be null"
         );
 
@@ -68,11 +69,9 @@ public final class WordleGame {
                 guess, "Guess word can't be null"
         );
 
-        if (guess.length() != secret.length()) {
-            throw new IllegalArgumentException(
-                    "Words must have the same length"
-            );
-        }
+        String normalizeGuess = dictionary.normalizeWord(guess);
+
+        validateWord(normalizeGuess);
 
         LetterState[] state = compareWords(guess, secret);
 
@@ -203,5 +202,28 @@ public final class WordleGame {
 
     public String getSecret() {
         return secret;
+    }
+
+    private void validateWord(final String word) {
+        if (!dictionary.hasValidLength(word)) {
+            throw new IllegalArgumentException(
+                    "Word has invalid length: " + word +
+                            ". Expected length: " + WordleDictionary.WORD_LENGTH
+            );
+        }
+
+        if (!dictionary.hasValidCharacters(word)) {
+            throw new IllegalArgumentException(
+                    "Word contains invalid characters: " + word +
+                            ". Valid pattern: " +
+                            WordleDictionary.WORD_PATTERN.pattern()
+            );
+        }
+
+        if (!dictionary.contains(word)) {
+            throw new IllegalArgumentException(
+                    "Dictionary does not contain word: " + word
+            );
+        }
     }
 }
