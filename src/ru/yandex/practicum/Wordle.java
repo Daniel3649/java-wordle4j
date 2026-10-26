@@ -56,7 +56,7 @@ public final class Wordle {
         }
     }
 
-    private static void gameLoop(
+    static void gameLoop(
             final WordleGame game,
             final Scanner scanner
     ) throws IOException {
