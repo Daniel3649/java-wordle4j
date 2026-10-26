@@ -25,7 +25,7 @@ class GameStepFormatterTest {
         var guess = new GameStepResult.Guess(
                 new LetterState[] {CORRECT, PRESENT, ABSENT, PRESENT, ABSENT});
 
-        assertEquals("+^-^-" + NL + "Remaining steps: 5", formatter.format(guess, 5));
+        assertEquals("+^-^-" + NL + "Осталось попыток: 5", formatter.format(guess, 5));
     }
 
     @Test
@@ -33,7 +33,7 @@ class GameStepFormatterTest {
         var hint = new GameStepResult.Hint(
                 new LetterState[] {CORRECT, PRESENT, ABSENT, PRESENT, ABSENT}, "гонец");
 
-        assertEquals("гонец" + NL + "+^-^-" + NL + "Remaining steps: 0",
+        assertEquals("гонец" + NL + "+^-^-" + NL + "Осталось попыток: 0",
                 formatter.format(hint, 0));
     }
 
@@ -42,7 +42,7 @@ class GameStepFormatterTest {
         var guess = new GameStepResult.Guess(
                 new LetterState[] {CORRECT, CORRECT, CORRECT, CORRECT, CORRECT});
 
-        assertEquals("+++++" + NL + "Remaining steps: 0", formatter.format(guess, 0));
+        assertEquals("+++++" + NL + "Осталось попыток: 0", formatter.format(guess, 0));
     }
 
     @Test

@@ -30,12 +30,12 @@ public final class LogEvent {
     LogEvent(final Logger logger, final LogLevel level) {
         this.logger = Objects.requireNonNull(
                 logger,
-                "Logger must not be null"
+                "Логгер не задан."
         );
 
         this.level = Objects.requireNonNull(
                 level,
-                "Log level must not be null"
+                "Уровень логирования не задан."
         );
 
         this.attributes = new LinkedHashMap<>();
@@ -58,7 +58,7 @@ public final class LogEvent {
 
         this.message = Objects.requireNonNull(
                 message,
-                "Log message must not be null"
+                "Сообщение лога не задано."
         );
 
         this.finalized = true;
@@ -72,8 +72,8 @@ public final class LogEvent {
     ) {
         ensureNotFinalized();
 
-        Objects.requireNonNull(format, "Format must not be null");
-        Objects.requireNonNull(args, "Arguments must not be null");
+        Objects.requireNonNull(format, "Формат сообщения не задан.");
+        Objects.requireNonNull(args, "Аргументы сообщения не заданы.");
 
         String message = String.format(
                 Locale.ROOT,
@@ -91,7 +91,7 @@ public final class LogEvent {
     public String getMessage() {
         if (!finalized) {
             throw new IllegalStateException(
-                    "Log event is not finalized"
+                    "Событие лога ещё не сформировано."
             );
         }
 
@@ -105,7 +105,7 @@ public final class LogEvent {
     private void ensureNotFinalized() {
         if (finalized) {
             throw new IllegalStateException(
-                    "Log event has already been submitted"
+                    "Событие лога уже отправлено."
             );
         }
     }
@@ -113,18 +113,18 @@ public final class LogEvent {
     private static void validateKey(final String key) {
         Objects.requireNonNull(
                 key,
-                "Log attribute key must not be null"
+                "Ключ поля лога не задан."
         );
 
         if (!KEY_PATTERN.matcher(key).matches()) {
             throw new IllegalArgumentException(
-                    "Invalid log attribute key: " + key
+                    "Недопустимый ключ поля лога: " + key
             );
         }
 
         if (RESERVED_KEYS.contains(key)) {
             throw new IllegalArgumentException(
-                    "Reserved log attribute key: " + key
+                    "Зарезервированный ключ поля лога: " + key
             );
         }
     }

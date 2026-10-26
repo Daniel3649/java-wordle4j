@@ -267,16 +267,16 @@ class WordleGameTest {
         for (int turn = 1; turn < 6 && !checkedGame.isFinished(); turn++) {
             GameStepResult.Hint hint = (GameStepResult.Hint) checkedGame.getHint();
             assertTrue(words.contains(hint.guess()));
-            assertFalse(history.containsKey(hint.guess()), "Hint must not repeat any previous guess");
+            assertFalse(history.containsKey(hint.guess()), "Подсказка не должна повторять предыдущие слова.");
             for (var previous : history.entrySet()) {
                 assertArrayEquals(previous.getValue(), referenceFeedback(previous.getKey(), hint.guess()),
-                        "Hint must satisfy feedback for " + previous.getKey());
+                        "Подсказка должна соответствовать результату проверки слова: " + previous.getKey());
             }
             assertArrayEquals(referenceFeedback(hint.guess(), secret), hint.state());
             history.put(hint.guess(), hint.state());
         }
 
-        assertTrue(checkedGame.isWon(), "Six candidates must be solvable in at most six distinct turns");
+        assertTrue(checkedGame.isWon(), "Для шести вариантов решение должно находиться не более чем за шесть разных ходов.");
         assertEquals(6 - history.size(), checkedGame.getRemainingSteps());
     }
 
@@ -311,7 +311,7 @@ class WordleGameTest {
             case '+' -> LetterState.CORRECT;
             case '^' -> LetterState.PRESENT;
             case '-' -> LetterState.ABSENT;
-            default -> throw new IllegalArgumentException("Unknown feedback symbol");
+            default -> throw new IllegalArgumentException("Неизвестный символ подсказки.");
         }).toArray(LetterState[]::new);
     }
 

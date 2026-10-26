@@ -33,7 +33,7 @@ public final class WordleDictionary {
     ) throws EmptyDictionaryException {
         Objects.requireNonNull(
                 words,
-                "Words must not be null"
+                "Список слов не задан."
         );
 
         this.logger = new Logger(log);
@@ -48,7 +48,7 @@ public final class WordleDictionary {
         for (String rawWord : rawWords) {
             if (rawWord == null) {
                 logger.atWarn()
-                        .log("Word list contains a null word");
+                        .log("В списке слов не задано одно из значений.");
                 continue;
             }
 
@@ -56,7 +56,7 @@ public final class WordleDictionary {
 
             if (word.isEmpty()) {
                 logger.atWarn()
-                        .log("Word list contains an empty or blank word");
+                        .log("В списке слов есть пустая строка.");
                 continue;
             }
 
@@ -66,7 +66,7 @@ public final class WordleDictionary {
                         .addKeyValue("word_length", word.length())
                         .addKeyValue("required_word_length", WORD_LENGTH)
                         .log(
-                                "Word list contains a word with unsuitable length"
+                                "В списке слов есть слово неподходящей длины."
                         );
                 continue;
             }
@@ -79,7 +79,7 @@ public final class WordleDictionary {
                                 WORD_PATTERN.pattern()
                         )
                         .log(
-                                "Word list contains a word with invalid characters"
+                                "В списке слов есть слово с недопустимыми символами."
                         );
                 continue;
             }
@@ -87,7 +87,7 @@ public final class WordleDictionary {
             if (!preparedWords.add(word)) {
                 logger.atWarn()
                         .addKeyValue("repeated_word", word)
-                        .log("Word list contains a duplicate word");
+                        .log("В списке слов есть повторяющееся слово.");
             }
         }
 
@@ -101,7 +101,7 @@ public final class WordleDictionary {
     public String normalizeWord(final String word) {
         Objects.requireNonNull(
                 word,
-                "Word must not be null"
+                "Слово не задано."
         );
 
         return word.strip()
@@ -112,7 +112,7 @@ public final class WordleDictionary {
     public boolean hasValidCharacters(final String word) {
         Objects.requireNonNull(
                 word,
-                "Word must not be null"
+                "Слово не задано."
         );
 
         return WORD_PATTERN.matcher(
@@ -123,7 +123,7 @@ public final class WordleDictionary {
     public boolean hasValidLength(final String word) {
         Objects.requireNonNull(
                 word,
-                "Word must not be null"
+                "Слово не задано."
         );
 
         return word.length() == WORD_LENGTH;

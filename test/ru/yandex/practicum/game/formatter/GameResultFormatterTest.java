@@ -26,8 +26,8 @@ class GameResultFormatterTest {
     void revealsSecretAfterVictory() throws Exception {
         game.evaluate(game.getSecret());
 
-        assertEquals("You win. Congratulations!" + System.lineSeparator()
-                + "Secret word: " + game.getSecret(), formatter.format(game));
+        assertEquals("Вы победили! Поздравляем!" + System.lineSeparator()
+                + "Загаданное слово: " + game.getSecret(), formatter.format(game));
     }
 
     @Test
@@ -37,8 +37,8 @@ class GameResultFormatterTest {
             game.evaluate(wrong);
         }
 
-        assertEquals("You lost" + System.lineSeparator()
-                + "Secret word: " + game.getSecret(), formatter.format(game));
+        assertEquals("Вы проиграли." + System.lineSeparator()
+                + "Загаданное слово: " + game.getSecret(), formatter.format(game));
     }
 
     @Test

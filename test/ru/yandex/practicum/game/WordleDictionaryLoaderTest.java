@@ -130,7 +130,7 @@ public class WordleDictionaryLoaderTest {
         loader.load(file);
 
         Files.delete(file);
-        log.println("Log remains usable after dictionary loading");
+        log.println("Лог доступен для записи после загрузки словаря.");
         assertAll(
                 () -> assertFalse(Files.exists(file)),
                 () -> assertFalse(log.checkError())

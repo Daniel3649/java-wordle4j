@@ -18,14 +18,14 @@ public final class GameStepFormatter {
             System.lineSeparator();
 
     private static final String REMAINING_STEPS_TEMPLATE =
-            "Remaining steps: %d";
+            "Осталось попыток: %d";
 
     public String format(
             final GameStepResult result,
             final int remainingSteps
     ) {
         Objects.requireNonNull(
-                result, "Result of step must not be null"
+                result, "Результат хода не задан."
         );
 
         String formattedResult = switch (result) {
@@ -47,7 +47,7 @@ public final class GameStepFormatter {
             final LetterState[] states
     ) {
         Objects.requireNonNull(
-                states, "States of guess word must not be null"
+                states, "Состояния букв не заданы."
         );
 
         StringBuilder resultLine = new StringBuilder(states.length);
@@ -56,7 +56,7 @@ public final class GameStepFormatter {
             resultLine.append(
                     Objects.requireNonNull(
                             CONSOLE_SYMBOLS.get(state),
-                            "Unknown letter state: " + state
+                            "Неизвестное состояние буквы: " + state
                     )
             );
         }

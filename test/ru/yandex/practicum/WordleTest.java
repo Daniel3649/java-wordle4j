@@ -62,8 +62,8 @@ class WordleTest {
         Reader input = new Reader() {
             @Override
             public int read(char[] buffer, int offset, int length) {
-                assertTrue(output.toString(StandardCharsets.UTF_8).contains("Enter"),
-                        "Player must see a prompt before input is requested");
+                assertTrue(output.toString(StandardCharsets.UTF_8).contains("Введите слово"),
+                        "Приглашение должно появиться до запроса ввода.");
                 return -1;
             }
 
@@ -91,7 +91,7 @@ class WordleTest {
                 () -> assertTrue(game.isWon()),
                 () -> assertEquals(5, game.getRemainingSteps()),
                 () -> assertFalse(text.contains("Exception")),
-                () -> assertFalse(text.contains("Game started")),
+                () -> assertFalse(text.contains("Игра началась.")),
                 () -> assertEquals("", errors.toString(StandardCharsets.UTF_8))
         );
     }
@@ -123,7 +123,7 @@ class WordleTest {
                     () -> assertFalse(game.isWon()),
                     () -> assertEquals(0, game.getRemainingSteps()),
                     () -> assertEquals("unused input", scanner.nextLine()),
-                    () -> assertTrue(output.toString(StandardCharsets.UTF_8).contains("Remaining steps: 0"))
+                    () -> assertTrue(output.toString(StandardCharsets.UTF_8).contains("Осталось попыток: 0"))
             );
         }
     }
@@ -159,7 +159,7 @@ class WordleTest {
 
     @Test
     void propagatesInputFailureForSystemLogging() {
-        IOException cause = new IOException("Console input failed");
+        IOException cause = new IOException("Ошибка чтения консольного ввода.");
         Reader broken = new Reader() {
             @Override
             public int read(char[] buffer, int offset, int length) throws IOException {
@@ -174,7 +174,7 @@ class WordleTest {
         try (Scanner scanner = new Scanner(broken)) {
             IOException error = assertThrows(IOException.class, () -> Wordle.gameLoop(game, scanner));
             assertSame(cause, error.getCause());
-            assertFalse(output.toString(StandardCharsets.UTF_8).contains("Console input failed"));
+            assertFalse(output.toString(StandardCharsets.UTF_8).contains("Ошибка чтения консольного ввода."));
             assertEquals("", errors.toString(StandardCharsets.UTF_8));
         }
     }

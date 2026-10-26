@@ -75,18 +75,18 @@ class LogEventTest {
 
     @Test
     void allowsNullAttributeValues() {
-        event.addKeyValue("value", null).log("Optional value");
+        event.addKeyValue("value", null).log("Необязательное значение.");
 
         assertTrue(output.toString(StandardCharsets.UTF_8).contains("value=\"null\""));
     }
 
     @Test
     void formatsMessagesWithArguments() {
-        event.log("Word %s, steps %d, score %.1f", "герой", 5, 2.5);
+        event.log("Слово %s, попыток %d, оценка %.1f", "герой", 5, 2.5);
 
-        assertEquals("Word герой, steps 5, score 2.5", event.getMessage());
+        assertEquals("Слово герой, попыток 5, оценка 2.5", event.getMessage());
         assertTrue(output.toString(StandardCharsets.UTF_8)
-                .contains("_msg=\"Word герой, steps 5, score 2.5\""));
+                .contains("_msg=\"Слово герой, попыток 5, оценка 2.5\""));
     }
 
     @Test
@@ -96,14 +96,14 @@ class LogEventTest {
 
     @Test
     void rejectsChangesAndRepeatedWritesAfterLogging() {
-        event.log("First message");
+        event.log("Первое сообщение.");
 
         assertAll(
-                () -> assertThrows(IllegalStateException.class, () -> event.log("Second message")),
-                () -> assertThrows(IllegalStateException.class, () -> event.log("%s", "Second message")),
+                () -> assertThrows(IllegalStateException.class, () -> event.log("Второе сообщение.")),
+                () -> assertThrows(IllegalStateException.class, () -> event.log("%s", "Второе сообщение.")),
                 () -> assertThrows(IllegalStateException.class, () -> event.addKeyValue("word", "герой")),
                 () -> assertEquals(1, output.toString(StandardCharsets.UTF_8).lines().count()),
-                () -> assertEquals("First message", event.getMessage())
+                () -> assertEquals("Первое сообщение.", event.getMessage())
         );
     }
 }

@@ -63,7 +63,7 @@ public final class Wordle {
         GameStepFormatter formatter = new GameStepFormatter();
 
         while (!game.isFinished()) {
-            System.out.println("Enter word or press Enter for hint:");
+            System.out.println("Введите слово из пяти букв или нажмите Enter для подсказки:");
             if (!scanner.hasNextLine()) {
                 break;
             }
@@ -90,7 +90,7 @@ public final class Wordle {
         }
 
         if (scanner.ioException() != null) {
-            throw new IOException("Failed to read user input", scanner.ioException());
+            throw new IOException("Не удалось прочитать пользовательский ввод.", scanner.ioException());
         }
     }
 
@@ -123,7 +123,7 @@ public final class Wordle {
 
     private static void ensureLogWritten(final PrintWriter log) {
         if (log.checkError()) {
-            throw new IllegalStateException("Failed to write or close log file");
+            throw new IllegalStateException("Не удалось записать или закрыть файл лога.");
         }
     }
 
@@ -140,7 +140,7 @@ public final class Wordle {
             new Logger(log).atError()
                     .addKeyValue("exception", error.getClass().getName())
                     .addKeyValue("stack_trace", stackTrace.toString())
-                    .log("Game stopped because of a system error");
+                    .log("Игра остановлена из-за системной ошибки.");
         } catch (RuntimeException loggingError) {
             loggingError.addSuppressed(error);
             throw loggingError;
@@ -156,7 +156,7 @@ public final class Wordle {
             }
             ensureLogWritten(log);
         } catch (Exception ignored) {
-            System.err.println("Game stopped: log files are unavailable.");
+            System.err.println("Игра остановлена: файлы логов недоступны.");
         }
     }
 

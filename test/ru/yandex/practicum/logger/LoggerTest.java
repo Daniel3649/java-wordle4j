@@ -61,7 +61,7 @@ class LoggerTest {
             case ERROR -> debugLogger.atError();
             case DEBUG -> debugLogger.atDebug();
         };
-        event.addKeyValue("remaining_steps", 6).log("Game started");
+        event.addKeyValue("remaining_steps", 6).log("Игра началась.");
 
         String text = output.toString(StandardCharsets.UTF_8);
         Matcher timestamp = Pattern.compile("_time=\"([^\"]+)\"").matcher(text);
@@ -69,7 +69,7 @@ class LoggerTest {
         assertDoesNotThrow(() -> Instant.parse(timestamp.group(1)));
         assertAll(
                 () -> assertTrue(text.contains("level=\"" + level.getText() + "\"")),
-                () -> assertTrue(text.contains("_msg=\"Game started\"")),
+                () -> assertTrue(text.contains("_msg=\"Игра началась.\"")),
                 () -> assertTrue(text.contains("remaining_steps=\"6\"")),
                 () -> assertEquals(1, text.lines().count())
         );
@@ -77,7 +77,7 @@ class LoggerTest {
 
     @Test
     void skipsDebugMessagesByDefault() {
-        logger.atDebug().log("Hidden debug message");
+        logger.atDebug().log("Скрытое отладочное сообщение.");
 
         assertEquals("", output.toString(StandardCharsets.UTF_8));
     }
@@ -86,13 +86,13 @@ class LoggerTest {
     void escapesQuotesBackslashesAndControlCharactersIntoSingleLine() {
         logger.atError()
                 .addKeyValue("path", "C:\\words\".txt")
-                .log("quote=\"; slash=\\; newline=\n; return=\r; tab=\t");
+                .log("кавычка=\"; слеш=\\; новая строка=\n; возврат=\r; табуляция=\t");
 
         String text = output.toString(StandardCharsets.UTF_8);
         assertAll(
                 () -> assertEquals(1, text.lines().count()),
                 () -> assertTrue(text.contains(
-                        "_msg=\"quote=\\\"; slash=\\\\; newline=\\n; return=\\r; tab=\\t\"")),
+                        "_msg=\"кавычка=\\\"; слеш=\\\\; новая строка=\\n; возврат=\\r; табуляция=\\t\"")),
                 () -> assertTrue(text.contains("path=\"C:\\\\words\\\".txt\""))
         );
     }
@@ -102,7 +102,7 @@ class LoggerTest {
         Writer broken = new Writer() {
             @Override
             public void write(char[] buffer, int offset, int length) throws IOException {
-                throw new IOException("Log storage is unavailable");
+                throw new IOException("Хранилище логов недоступно.");
             }
 
             @Override
@@ -115,7 +115,7 @@ class LoggerTest {
         };
         try (PrintWriter failedLog = new PrintWriter(broken)) {
             assertThrows(IllegalStateException.class,
-                    () -> new Logger(failedLog).atError().log("System error"));
+                    () -> new Logger(failedLog).atError().log("Системная ошибка."));
         }
     }
 
@@ -125,7 +125,7 @@ class LoggerTest {
         closed.close();
 
         assertThrows(IllegalStateException.class,
-                () -> new Logger(closed).atInfo().log("Cannot write"));
+                () -> new Logger(closed).atInfo().log("Запись невозможна."));
     }
 
     @Test
@@ -143,9 +143,9 @@ class LoggerTest {
                 () -> assertTrue(text.contains("guess_word=\"герой\"")),
                 () -> assertTrue(text.contains(
                         "letter_states=\"[CORRECT, CORRECT, CORRECT, CORRECT, CORRECT]\"")),
-                () -> assertTrue(text.contains("Result: [CORRECT, CORRECT, CORRECT, CORRECT, CORRECT]")),
-                () -> assertTrue(text.contains("Game won")),
-                () -> assertFalse(text.contains("Result: герой")),
+                () -> assertTrue(text.contains("Результат: [CORRECT, CORRECT, CORRECT, CORRECT, CORRECT]")),
+                () -> assertTrue(text.contains("Игрок победил.")),
+                () -> assertFalse(text.contains("Результат: герой")),
                 () -> assertFalse(log.checkError())
         );
     }
@@ -161,7 +161,7 @@ class LoggerTest {
 
         String text = output.toString(StandardCharsets.UTF_8);
         assertTrue(text.contains("remaining_steps=\"0\""));
-        assertTrue(text.contains("Game lost"));
+        assertTrue(text.contains("Игрок проиграл."));
     }
 
     @Test

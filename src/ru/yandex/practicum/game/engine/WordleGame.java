@@ -50,7 +50,7 @@ public final class WordleGame {
     WordleGame(final WordleDictionary dictionary, final PrintWriter log,
                final RandomGenerator random) throws EmptyDictionaryException {
         this.dictionary = Objects.requireNonNull(
-                dictionary, "Dictionary can't be null"
+                dictionary, "Словарь не задан."
         );
 
         List<String> allDictionaryWords = List.copyOf(dictionary.getWordList());
@@ -61,7 +61,7 @@ public final class WordleGame {
 
         this.logger = new Logger(log);
 
-        int randomIndex = Objects.requireNonNull(random, "Random generator must not be null")
+        int randomIndex = Objects.requireNonNull(random, "Генератор случайных чисел не задан.")
                 .nextInt(allDictionaryWords.size());
 
         this.secret = allDictionaryWords.get(randomIndex);
@@ -72,7 +72,7 @@ public final class WordleGame {
                 .addKeyValue("secret", secret)
                 .addKeyValue("remaining_steps", remainingSteps)
                 .addKeyValue("candidate_count", wordCandidates.size())
-                .log("Game started");
+                .log("Игра началась.");
     }
 
     public GameStepResult evaluate(final String guess)
@@ -81,12 +81,12 @@ public final class WordleGame {
             WordNotFoundInDictionaryException {
         if (isFinished()) {
             throw new IllegalStateException(
-                    "Game is already finished"
+                    "Игра уже завершена."
             );
         }
 
         Objects.requireNonNull(
-                guess, "Guess word can't be null"
+                guess, "Проверяемое слово не задано."
         );
 
         String normalizedGuess = dictionary.normalizeWord(guess);
@@ -98,7 +98,7 @@ public final class WordleGame {
         logger.atInfo()
                 .addKeyValue("guess_word", normalizedGuess)
                 .addKeyValue("letter_states", Arrays.toString(state))
-                .log("Guess word %s was compared with secret. Result: %s",
+                .log("Слово %s сравнено с загаданным. Результат: %s",
                         normalizedGuess, Arrays.toString(state));
 
         filterCandidates(normalizedGuess, state);
@@ -107,18 +107,18 @@ public final class WordleGame {
         logger.atInfo()
                 .addKeyValue("remaining_steps", remainingSteps)
                 .addKeyValue("candidate_count", wordCandidates.size())
-                .log("Remaining steps: %s", remainingSteps);
+                .log("Осталось попыток: %s", remainingSteps);
 
         if (normalizedGuess.equals(secret)) {
             won = true;
 
             logger.atInfo()
                     .addKeyValue("remaining_steps", remainingSteps)
-                    .log("Game won");
+                    .log("Игрок победил.");
         } else if (remainingSteps == 0) {
             logger.atInfo()
                     .addKeyValue("secret", secret)
-                    .log("Game lost");
+                    .log("Игрок проиграл.");
         }
 
         return new GameStepResult.Guess(state);
@@ -129,10 +129,10 @@ public final class WordleGame {
             final String secret
     ) {
         Objects.requireNonNull(
-                guess, "Guess word can't be null"
+                guess, "Проверяемое слово не задано."
         );
         Objects.requireNonNull(
-                secret, "Secret word can't be null"
+                secret, "Загаданное слово не задано."
         );
 
         int length = guess.length();
@@ -193,7 +193,7 @@ public final class WordleGame {
     public GameStepResult getHint() {
         if (isFinished()) {
             throw new IllegalStateException(
-                    "Game is already finished"
+                    "Игра уже завершена."
             );
         }
 
@@ -203,14 +203,14 @@ public final class WordleGame {
 
         logger.atInfo()
                 .addKeyValue("hint", chosenWord)
-                .log("Hint was chosen: %s", chosenWord);
+                .log("Выбрана подсказка: %s", chosenWord);
 
         try {
             GameStepResult result = evaluate(chosenWord);
             return new GameStepResult.Hint(result.state(), chosenWord);
         } catch (GameException e) {
             throw new IllegalStateException(
-                    "Hint selected from dictionary failed validation: " + chosenWord,
+                    "Подсказка из словаря не прошла проверку: " + chosenWord,
                     e
             );
         }

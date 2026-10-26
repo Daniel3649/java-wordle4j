@@ -27,7 +27,7 @@ public final class WordleDictionaryLoader {
     public WordleDictionaryLoader(final PrintWriter log) {
         this.log = Objects.requireNonNull(
                 log,
-                "Log writer must not be null"
+                "Поток записи лога не задан."
         );
         this.logger = new Logger(log);
     }
@@ -37,14 +37,14 @@ public final class WordleDictionaryLoader {
 
         Objects.requireNonNull(
                 path,
-                "Dictionary path must not be null"
+                "Путь к файлу словаря не задан."
         );
 
         List<String> words = new ArrayList<>();
         try {
             if (!Files.isRegularFile(path)) {
                 throw new IOException(
-                        "Dictionary path must point to a regular file: " + path
+                        "Путь к словарю должен указывать на обычный файл: " + path
                 );
             }
 
@@ -64,7 +64,7 @@ public final class WordleDictionaryLoader {
         logger.atInfo()
                 .addKeyValue("path", path)
                 .addKeyValue("word_count", words.size())
-                .log("Words are loaded from file: %s", path.toString());
+                .log("Слова загружены из файла: %s", path.toString());
 
         return new WordleDictionary(words, log);
     }

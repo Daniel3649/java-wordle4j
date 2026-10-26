@@ -18,7 +18,7 @@ public final class Logger {
     }
 
     public Logger(final PrintWriter out, final boolean debugMode) {
-        this.out = Objects.requireNonNull(out, "Log writer must not be null");
+        this.out = Objects.requireNonNull(out, "Поток записи лога не задан.");
         this.debugMode = debugMode;
     }
 
@@ -43,7 +43,7 @@ public final class Logger {
     }
 
     void write(final LogEvent event) {
-        Objects.requireNonNull(event, "Log event must not be null");
+        Objects.requireNonNull(event, "Событие лога не задано.");
 
         if (event.getLevel() == LogLevel.DEBUG && !debugMode) {
             return;
@@ -83,7 +83,7 @@ public final class Logger {
 
         if (out.checkError()) {
             throw new IllegalStateException(
-                    "Failed to write log event"
+                    "Не удалось записать событие в лог."
             );
         }
     }
