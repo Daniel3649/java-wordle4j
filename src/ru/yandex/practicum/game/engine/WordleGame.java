@@ -10,8 +10,14 @@ import ru.yandex.practicum.game.step.GameStepResult;
 import ru.yandex.practicum.logger.Logger;
 
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.random.RandomGenerator;
 
 /*
 в этом классе хранится словарь и состояние игры
@@ -38,6 +44,11 @@ public final class WordleGame {
 
     public WordleGame(final WordleDictionary dictionary, final PrintWriter log)
             throws EmptyDictionaryException {
+        this(dictionary, log, ThreadLocalRandom.current());
+    }
+
+    WordleGame(final WordleDictionary dictionary, final PrintWriter log,
+               final RandomGenerator random) throws EmptyDictionaryException {
         this.dictionary = Objects.requireNonNull(
                 dictionary, "Dictionary can't be null"
         );
@@ -50,7 +61,7 @@ public final class WordleGame {
 
         this.logger = new Logger(log);
 
-        int randomIndex = ThreadLocalRandom.current()
+        int randomIndex = Objects.requireNonNull(random, "Random generator must not be null")
                 .nextInt(allDictionaryWords.size());
 
         this.secret = allDictionaryWords.get(randomIndex);
