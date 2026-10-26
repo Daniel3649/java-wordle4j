@@ -69,25 +69,25 @@ public final class WordleGame {
                 guess, "Guess word can't be null"
         );
 
-        String normalizeGuess = dictionary.normalizeWord(guess);
+        String normalizedGuess = dictionary.normalizeWord(guess);
 
-        validateWord(normalizeGuess);
+        validateWord(normalizedGuess);
 
-        LetterState[] state = compareWords(guess, secret);
+        LetterState[] state = compareWords(normalizedGuess, secret);
 
         logger.atInfo()
-                .addKeyValue("guess_word", guess)
+                .addKeyValue("guess_word", normalizedGuess)
                 .log("Guess word %s was compared with secret. Result: %s",
-                        guess, secret, Arrays.toString(state));
+                        normalizedGuess, secret, Arrays.toString(state));
 
-        filterCandidates(guess, state);
+        filterCandidates(normalizedGuess, state);
 
         remainingSteps--;
         logger.atInfo()
                 .addKeyValue("remaining_steps", remainingSteps)
                 .log("Remaining steps: %s", remainingSteps);
 
-        if (guess.equals(secret)) {
+        if (normalizedGuess.equals(secret)) {
             won = true;
 
             logger.atInfo()
@@ -178,14 +178,8 @@ public final class WordleGame {
                 .addKeyValue("hint", chosenWord)
                 .log("Hint was chosen: %s", chosenWord);
 
-        LetterState[] state = compareWords(chosenWord, secret);
-        logger.atInfo()
-                .addKeyValue("guess_word", chosenWord)
-                .log("Chosen word %s was compared with secret. Result: %s",
-                        chosenWord, secret, Arrays.toString(state));
-
-        filterCandidates(chosenWord, state);
-        return new GameStepResult.Hint(state, chosenWord);
+        GameStepResult result = evaluate(chosenWord);
+        return new GameStepResult.Hint(result.state(), chosenWord);
     }
 
     public boolean isWon() {
