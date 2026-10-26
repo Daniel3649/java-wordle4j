@@ -1,5 +1,6 @@
 package ru.yandex.practicum.game.dictionary;
 
+import ru.yandex.practicum.exception.EmptyDictionaryException;
 import ru.yandex.practicum.logger.Logger;
 
 import java.util.*;
@@ -23,7 +24,7 @@ public final class WordleDictionary {
     public WordleDictionary(
             final List<String> words,
             final Logger logger
-    ) {
+    ) throws EmptyDictionaryException {
         Objects.requireNonNull(
                 words,
                 "Words must not be null"
@@ -37,7 +38,8 @@ public final class WordleDictionary {
         this.words = prepareWords(words);
     }
 
-    private Set<String> prepareWords(final List<String> rawWords) {
+    private Set<String> prepareWords(final List<String> rawWords)
+            throws EmptyDictionaryException {
         Set<String> preparedWords = new LinkedHashSet<>();
 
         for (String rawWord : rawWords) {
@@ -87,9 +89,7 @@ public final class WordleDictionary {
         }
 
         if (preparedWords.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Word list must contain at least one valid word"
-            );
+            throw new EmptyDictionaryException();
         }
 
         return Collections.unmodifiableSet(preparedWords);

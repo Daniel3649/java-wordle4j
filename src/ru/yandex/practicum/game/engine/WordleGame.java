@@ -1,5 +1,10 @@
 package ru.yandex.practicum.game.engine;
 
+import ru.yandex.practicum.exception.EmptyDictionaryException;
+import ru.yandex.practicum.exception.GameException;
+import ru.yandex.practicum.exception.InvalidWordCharactersException;
+import ru.yandex.practicum.exception.InvalidWordLengthException;
+import ru.yandex.practicum.exception.WordNotFoundInDictionaryException;
 import ru.yandex.practicum.game.dictionary.WordleDictionary;
 import ru.yandex.practicum.game.step.GameStepResult;
 import ru.yandex.practicum.logger.Logger;
@@ -30,7 +35,8 @@ public final class WordleGame {
 
     private boolean won;
 
-    public WordleGame(final WordleDictionary dictionary, final Logger logger) {
+    public WordleGame(final WordleDictionary dictionary, final Logger logger)
+            throws EmptyDictionaryException {
         this.dictionary = Objects.requireNonNull(
                 dictionary, "Dictionary can't be null"
         );
@@ -38,9 +44,7 @@ public final class WordleGame {
         List<String> allDictionaryWords = List.copyOf(dictionary.getWordList());
 
         if (allDictionaryWords.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Dictionary is empty"
-            );
+            throw new EmptyDictionaryException();
         }
 
         this.logger = Objects.requireNonNull(
@@ -58,7 +62,10 @@ public final class WordleGame {
         this.wordCandidates = new ArrayList<>(allDictionaryWords);
     }
 
-    public GameStepResult evaluate(final String guess) {
+    public GameStepResult evaluate(final String guess)
+            throws InvalidWordLengthException,
+            InvalidWordCharactersException,
+            WordNotFoundInDictionaryException {
         if (isFinished()) {
             throw new IllegalStateException(
                     "Game is already finished"
@@ -178,8 +185,15 @@ public final class WordleGame {
                 .addKeyValue("hint", chosenWord)
                 .log("Hint was chosen: %s", chosenWord);
 
-        GameStepResult result = evaluate(chosenWord);
-        return new GameStepResult.Hint(result.state(), chosenWord);
+        try {
+            GameStepResult result = evaluate(chosenWord);
+            return new GameStepResult.Hint(result.state(), chosenWord);
+        } catch (GameException e) {
+            throw new IllegalStateException(
+                    "Hint selected from dictionary failed validation: " + chosenWord,
+                    e
+            );
+        }
     }
 
     public boolean isWon() {
@@ -198,26 +212,22 @@ public final class WordleGame {
         return secret;
     }
 
-    private void validateWord(final String word) {
+    private void validateWord(final String word)
+            throws InvalidWordLengthException,
+            InvalidWordCharactersException,
+            WordNotFoundInDictionaryException {
         if (!dictionary.hasValidLength(word)) {
-            throw new IllegalArgumentException(
-                    "Word has invalid length: " + word +
-                            ". Expected length: " + WordleDictionary.WORD_LENGTH
+            throw new InvalidWordLengthException(
+                    WordleDictionary.WORD_LENGTH
             );
         }
 
         if (!dictionary.hasValidCharacters(word)) {
-            throw new IllegalArgumentException(
-                    "Word contains invalid characters: " + word +
-                            ". Valid pattern: " +
-                            WordleDictionary.WORD_PATTERN.pattern()
-            );
+            throw new InvalidWordCharactersException();
         }
 
         if (!dictionary.contains(word)) {
-            throw new IllegalArgumentException(
-                    "Dictionary does not contain word: " + word
-            );
+            throw new WordNotFoundInDictionaryException(word);
         }
     }
 }

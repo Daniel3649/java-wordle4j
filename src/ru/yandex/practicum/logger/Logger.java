@@ -1,5 +1,7 @@
 package ru.yandex.practicum.logger;
 
+import ru.yandex.practicum.exception.LogInitializationException;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -19,22 +21,27 @@ public final class Logger implements AutoCloseable {
     private boolean closed;
     private final boolean debugMode;
 
-    public Logger(final Path path) throws IOException {
+    public Logger(final Path path) throws LogInitializationException {
         this(path, false);
     }
 
-    public Logger(final Path path, final boolean debugMode) throws IOException {
+    public Logger(final Path path, final boolean debugMode)
+            throws LogInitializationException {
         Objects.requireNonNull(path, "Log path must not be null");
 
         this.debugMode = debugMode;
-        this.out = new PrintWriter(
-                Files.newBufferedWriter(
-                        path,
-                        StandardCharsets.UTF_8,
-                        StandardOpenOption.CREATE,
-                        StandardOpenOption.APPEND
-                )
-        );
+        try {
+            this.out = new PrintWriter(
+                    Files.newBufferedWriter(
+                            path,
+                            StandardCharsets.UTF_8,
+                            StandardOpenOption.CREATE,
+                            StandardOpenOption.APPEND
+                    )
+            );
+        } catch (IOException | SecurityException e) {
+            throw new LogInitializationException(path, e);
+        }
     }
 
     public LogEvent atInfo() {

@@ -1,5 +1,7 @@
 package ru.yandex.practicum.game.dictionary;
 
+import ru.yandex.practicum.exception.DictionaryLoadException;
+import ru.yandex.practicum.exception.EmptyDictionaryException;
 import ru.yandex.practicum.logger.Logger;
 
 import java.io.IOException;
@@ -26,23 +28,28 @@ public final class WordleDictionaryLoader {
     }
 
     public WordleDictionary load(final Path path)
-            throws IOException {
+            throws DictionaryLoadException, EmptyDictionaryException {
 
         Objects.requireNonNull(
                 path,
                 "Dictionary path must not be null"
         );
 
-        if (!Files.isRegularFile(path)) {
-            throw new IOException(
-                    "Dictionary path must point to a regular file: " + path
-            );
-        }
+        List<String> words;
+        try {
+            if (!Files.isRegularFile(path)) {
+                throw new IOException(
+                        "Dictionary path must point to a regular file: " + path
+                );
+            }
 
-        List<String> words = Files.readAllLines(
-                path,
-                StandardCharsets.UTF_8
-        );
+            words = Files.readAllLines(
+                    path,
+                    StandardCharsets.UTF_8
+            );
+        } catch (IOException | SecurityException e) {
+            throw new DictionaryLoadException(path, e);
+        }
 
         logger.atInfo()
                 .addKeyValue("path", path)

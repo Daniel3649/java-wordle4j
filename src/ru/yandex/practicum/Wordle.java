@@ -1,5 +1,7 @@
 package ru.yandex.practicum;
 
+import ru.yandex.practicum.exception.GameException;
+import ru.yandex.practicum.exception.WordleSystemException;
 import ru.yandex.practicum.game.dictionary.WordleDictionary;
 import ru.yandex.practicum.game.dictionary.WordleDictionaryLoader;
 import ru.yandex.practicum.game.engine.WordleGame;
@@ -9,6 +11,9 @@ import ru.yandex.practicum.game.step.GameStepResult;
 import ru.yandex.practicum.logger.Logger;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Scanner;
 
@@ -27,29 +32,27 @@ public final class Wordle {
     private static final Path DICTIONARY_PATH = Path.of("words_ru.txt");
 
     public static void main(String[] args) {
-        try (
-                Logger logger = new Logger(LOG_PATH);
-                Scanner scanner = new Scanner(System.in)
-        ) {
-            WordleGame game = initializeGame(logger);
+        try (Logger logger = new Logger(LOG_PATH)) {
+            try (Scanner scanner = new Scanner(System.in)) {
+                WordleGame game = initializeGame(logger);
 
-            gameLoop(game, scanner);
+                gameLoop(game, scanner);
 
-            if (game.isFinished()) {
-                outputGameResult(game);
+                if (game.isFinished()) {
+                    outputGameResult(game);
+                }
+            } catch (Exception e) {
+                logSystemError(logger, e);
             }
-
-        } catch (IOException e) {
-            System.err.println(
-                    "Failed to initialize game: " + e.getMessage()
-            );
+        } catch (Exception e) {
+            logEmergencyError(e);
         }
     }
 
     private static void gameLoop(
             final WordleGame game,
             final Scanner scanner
-    ) {
+    ) throws IOException {
         GameStepFormatter formatter = new GameStepFormatter();
 
         while (!game.isFinished() && scanner.hasNextLine()) {
@@ -70,15 +73,19 @@ public final class Wordle {
 
                 System.out.println(stepMessage);
 
-            } catch (Exception e) {
-
+            } catch (GameException e) {
+                System.out.println(e.getMessage());
             }
+        }
+
+        if (scanner.ioException() != null) {
+            throw new IOException("Failed to read user input", scanner.ioException());
         }
     }
 
     private static WordleGame initializeGame(
             final Logger logger
-    ) throws IOException {
+    ) throws WordleSystemException {
         WordleDictionaryLoader loader =
                 new WordleDictionaryLoader(logger);
 
@@ -87,6 +94,37 @@ public final class Wordle {
         );
 
         return new WordleGame(dictionary, logger);
+    }
+
+    private static void logSystemError(
+            final Logger logger,
+            final Exception error
+    ) {
+        try {
+            StringWriter stackTrace = new StringWriter();
+            try (PrintWriter writer = new PrintWriter(stackTrace)) {
+                error.printStackTrace(writer);
+            }
+
+            logger.atError()
+                    .addKeyValue("exception", error.getClass().getName())
+                    .addKeyValue("stack_trace", stackTrace.toString())
+                    .log("Game stopped because of a system error");
+        } catch (RuntimeException loggingError) {
+            loggingError.addSuppressed(error);
+            throw loggingError;
+        }
+    }
+
+    private static void logEmergencyError(final Exception error) {
+        try {
+            Path emergencyLog = Files.createTempFile("wordle-error-", ".log");
+            try (Logger logger = new Logger(emergencyLog)) {
+                logSystemError(logger, error);
+            }
+        } catch (Exception e) {
+            System.err.println("Game was stopped: saving log journal is failed");
+        }
     }
 
     private static void outputGameResult(final WordleGame game) {
