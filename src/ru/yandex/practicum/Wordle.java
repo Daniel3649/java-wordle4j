@@ -62,7 +62,11 @@ public final class Wordle {
     ) throws IOException {
         GameStepFormatter formatter = new GameStepFormatter();
 
-        while (!game.isFinished() && scanner.hasNextLine()) {
+        while (!game.isFinished()) {
+            System.out.println("Enter word or press Enter for hint:");
+            if (!scanner.hasNextLine()) {
+                break;
+            }
             String userInput = scanner.nextLine();
 
             try {
@@ -151,7 +155,7 @@ public final class Wordle {
                 logSystemError(log, error);
             }
             ensureLogWritten(log);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             System.err.println("Game was stopped: saving log journal is failed");
         }
     }
