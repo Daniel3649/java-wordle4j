@@ -156,7 +156,7 @@ public final class Wordle {
             }
             ensureLogWritten(log);
         } catch (Exception ignored) {
-            System.err.println("Game was stopped: saving log journal is failed");
+            System.err.println("Game stopped: log files are unavailable.");
         }
     }
 
