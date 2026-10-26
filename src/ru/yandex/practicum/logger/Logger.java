@@ -1,47 +1,25 @@
 package ru.yandex.practicum.logger;
 
-import ru.yandex.practicum.exception.LogInitializationException;
-
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 
-public final class Logger implements AutoCloseable {
+public final class Logger {
 
     private static final String FIELD_SEPARATOR = " ";
     private static final String KEY_VALUE_SEPARATOR = "=";
 
     private final PrintWriter out;
-    private boolean closed;
     private final boolean debugMode;
 
-    public Logger(final Path path) throws LogInitializationException {
-        this(path, false);
+    public Logger(final PrintWriter out) {
+        this(out, false);
     }
 
-    public Logger(final Path path, final boolean debugMode)
-            throws LogInitializationException {
-        Objects.requireNonNull(path, "Log path must not be null");
-
+    public Logger(final PrintWriter out, final boolean debugMode) {
+        this.out = Objects.requireNonNull(out, "Log writer must not be null");
         this.debugMode = debugMode;
-        try {
-            this.out = new PrintWriter(
-                    Files.newBufferedWriter(
-                            path,
-                            StandardCharsets.UTF_8,
-                            StandardOpenOption.CREATE,
-                            StandardOpenOption.APPEND
-                    )
-            );
-        } catch (IOException | SecurityException e) {
-            throw new LogInitializationException(path, e);
-        }
     }
 
     public LogEvent atInfo() {
@@ -61,13 +39,11 @@ public final class Logger implements AutoCloseable {
     }
 
     private LogEvent newEvent(final LogLevel level) {
-        ensureOpen();
         return new LogEvent(this, level);
     }
 
     void write(final LogEvent event) {
         Objects.requireNonNull(event, "Log event must not be null");
-        ensureOpen();
 
         if (event.getLevel() == LogLevel.DEBUG && !debugMode) {
             return;
@@ -133,29 +109,5 @@ public final class Logger implements AutoCloseable {
                 .append('"')
                 .append(text)
                 .append('"');
-    }
-
-    private void ensureOpen() {
-        if (closed) {
-            throw new IllegalStateException(
-                    "Logger is already closed"
-            );
-        }
-    }
-
-    @Override
-    public void close() {
-        if (closed) {
-            return;
-        }
-
-        closed = true;
-        out.close();
-
-        if (out.checkError()) {
-            throw new IllegalStateException(
-                    "Failed to close logger"
-            );
-        }
     }
 }

@@ -3,6 +3,7 @@ package ru.yandex.practicum.game.dictionary;
 import ru.yandex.practicum.exception.EmptyDictionaryException;
 import ru.yandex.practicum.logger.Logger;
 
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -23,17 +24,14 @@ public final class WordleDictionary {
 
     public WordleDictionary(
             final List<String> words,
-            final Logger logger
+            final PrintWriter log
     ) throws EmptyDictionaryException {
         Objects.requireNonNull(
                 words,
                 "Words must not be null"
         );
 
-        this.logger = Objects.requireNonNull(
-                logger,
-                "Logger must not be null"
-        );
+        this.logger = new Logger(log);
 
         this.words = prepareWords(words);
     }

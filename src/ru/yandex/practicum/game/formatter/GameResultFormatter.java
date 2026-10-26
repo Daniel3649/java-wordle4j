@@ -19,11 +19,9 @@ public final class GameResultFormatter {
             throw new IllegalStateException("Game is not finished");
         }
 
-        if (game.isWon()) {
-            return VICTORY_LABEL;
-        }
+        String resultLabel = game.isWon() ? VICTORY_LABEL : LOSE_LABEL;
 
-        return LOSE_LABEL
+        return resultLabel
                 + LINE_SEPARATOR
                 + SECRET_WORD_TEMPLATE.formatted(game.getSecret());
     }

@@ -9,6 +9,7 @@ import ru.yandex.practicum.game.dictionary.WordleDictionary;
 import ru.yandex.practicum.game.step.GameStepResult;
 import ru.yandex.practicum.logger.Logger;
 
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -35,7 +36,7 @@ public final class WordleGame {
 
     private boolean won;
 
-    public WordleGame(final WordleDictionary dictionary, final Logger logger)
+    public WordleGame(final WordleDictionary dictionary, final PrintWriter log)
             throws EmptyDictionaryException {
         this.dictionary = Objects.requireNonNull(
                 dictionary, "Dictionary can't be null"
@@ -47,19 +48,20 @@ public final class WordleGame {
             throw new EmptyDictionaryException();
         }
 
-        this.logger = Objects.requireNonNull(
-                logger, "Logger can't be null"
-        );
+        this.logger = new Logger(log);
 
         int randomIndex = ThreadLocalRandom.current()
                 .nextInt(allDictionaryWords.size());
 
         this.secret = allDictionaryWords.get(randomIndex);
-        logger.atInfo()
-                .log("Secret was chosen");
-
         this.remainingSteps = STEP_COUNT;
         this.wordCandidates = new ArrayList<>(allDictionaryWords);
+
+        logger.atInfo()
+                .addKeyValue("secret", secret)
+                .addKeyValue("remaining_steps", remainingSteps)
+                .addKeyValue("candidate_count", wordCandidates.size())
+                .log("Game started");
     }
 
     public GameStepResult evaluate(final String guess)
@@ -84,21 +86,28 @@ public final class WordleGame {
 
         logger.atInfo()
                 .addKeyValue("guess_word", normalizedGuess)
+                .addKeyValue("letter_states", Arrays.toString(state))
                 .log("Guess word %s was compared with secret. Result: %s",
-                        normalizedGuess, secret, Arrays.toString(state));
+                        normalizedGuess, Arrays.toString(state));
 
         filterCandidates(normalizedGuess, state);
 
         remainingSteps--;
         logger.atInfo()
                 .addKeyValue("remaining_steps", remainingSteps)
+                .addKeyValue("candidate_count", wordCandidates.size())
                 .log("Remaining steps: %s", remainingSteps);
 
         if (normalizedGuess.equals(secret)) {
             won = true;
 
             logger.atInfo()
+                    .addKeyValue("remaining_steps", remainingSteps)
                     .log("Game won");
+        } else if (remainingSteps == 0) {
+            logger.atInfo()
+                    .addKeyValue("secret", secret)
+                    .log("Game lost");
         }
 
         return new GameStepResult.Guess(state);
