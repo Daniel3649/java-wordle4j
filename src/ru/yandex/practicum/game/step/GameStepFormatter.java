@@ -1,7 +1,6 @@
 package ru.yandex.practicum.game.step;
 
 import ru.yandex.practicum.game.engine.LetterState;
-import ru.yandex.practicum.game.engine.WordleGame;
 
 import java.util.Map;
 import java.util.Objects;
